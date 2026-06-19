@@ -1,0 +1,46 @@
+name: API Test Suite
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Run pytest — GitHub API
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run smoke tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_API_TOKEN }}
+          GITHUB_USERNAME: Michael-QA-Labs
+        run: pytest -m smoke --tb=short
+
+      - name: Run full test suite
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_API_TOKEN }}
+          GITHUB_USERNAME: Michael-QA-Labs
+        run: pytest --tb=short
+
+      - name: Upload HTML test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: reports/test-report.html
+          retention-days: 30
