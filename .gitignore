@@ -6,3 +6,4 @@ __pycache__/
 allure-results/
 reports/
 .DS_Store
+sql/github_data.db
